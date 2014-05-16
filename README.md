@@ -1,11 +1,11 @@
-# configuration-map
+# config-map
 
-namespaced, templated map, for configuration
+templated & namespaced immutable maps, for configuration
 
 ## Usage
 
 ```clj
-(use '[matross.config-map :only [config-map]])
+(require '[matross.config-map :refer [config-map]])
 
 (def config (config-map {
   :system {
@@ -19,9 +19,15 @@ namespaced, templated map, for configuration
   }
 }))
 
+(def other-config (assoc config :system/home "/home/other"
+                                :system/hostname "other-box"))
+
 ;; top level keys become configuration namespaces
-(:script config) ; => "/home/user/bin/script.sh"
-(:system/hostname config) ; => "box"
+(:script other-config) ; => "/home/other/bin/script.sh"
+(:script config)       ; => "/home/user/bin/script.sh"
+
+(:system/hostname config)       ; => "box"
+(:system/hostname other-config) ; => "other-box"
 ```
 
 Copyright © 2014 FIXME
