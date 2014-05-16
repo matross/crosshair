@@ -5,8 +5,11 @@
            clojure.lang.Seqable
            clojure.lang.SeqIterator
            clojure.lang.IPersistentCollection
+           clojure.lang.IPersistentMap
            clojure.lang.Associative
            clojure.lang.MapEntry))
+
+(declare config-map)
 
 (def mustache-renderer
   (reify IRender
@@ -41,6 +44,27 @@
                        ns-sep
                        default-ns)))
 
+  (empty [this] (ConfigResolver. {} ns-sep default-ns))
+  (equiv [this o] (= (seq this) (seq o)))
+  (count [this] (apply + (map #(count (val %1)) value)))
+
+  IPersistentMap
+  (assoc [this k v]
+    (let [full-key (internal-key k ns-sep default-ns)
+          new-value (assoc-in value full-key v)]
+      (config-map new-value ns-sep default-ns)))
+
+  (assocEx [this k v]
+    (let [[ns _] (internal-key k ns-sep default-ns)]
+      (if (contains? k (ns value))
+        (throw (IllegalArgumentException. (str "Already contains key: " k)))
+        (.assoc this k v))))
+
+  (without [this k]
+    (let [[ns k] (internal-key k ns-sep default-ns)
+          without-k (update-in value [ns] dissoc k)]
+      (config-map without-k ns-sep default-ns)))
+
   Associative
   (containsKey [this k]
     (let [[ns-key target-key :as full-key] (internal-key k ns-sep default-ns)]
@@ -52,10 +76,6 @@
         (MapEntry.
          (external-key full-key ns-sep)
          (get-in value full-key)))))
-
-  (empty [this] (ConfigResolver. {} ns-sep default-ns))
-  (equiv [this o] (= value o))
-  (count [this] (apply + (map #(count (val %1)) value)))
 
   Seqable
   (seq [this]
