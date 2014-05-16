@@ -1,4 +1,4 @@
-(ns matross.config-map
+(ns matross.crosshair
   (:require [matross.mapstache :refer [IRender mapstache no-template]]
             [stencil.core :as mustache])
   (:import clojure.lang.ILookup
@@ -9,7 +9,7 @@
            clojure.lang.Associative
            clojure.lang.MapEntry))
 
-(declare config-map)
+(declare crosshair)
 
 (def mustache-renderer
   (reify IRender
@@ -52,7 +52,7 @@
   (assoc [this k v]
     (let [full-key (internal-key k ns-sep default-ns)
           new-value (assoc-in value full-key v)]
-      (config-map new-value ns-sep default-ns)))
+      (crosshair new-value ns-sep default-ns)))
 
   (assocEx [this k v]
     (let [[ns _] (internal-key k ns-sep default-ns)]
@@ -63,7 +63,7 @@
   (without [this k]
     (let [[ns k] (internal-key k ns-sep default-ns)
           without-k (update-in value [ns] dissoc k)]
-      (config-map without-k ns-sep default-ns)))
+      (crosshair without-k ns-sep default-ns)))
 
   Associative
   (containsKey [this k]
@@ -88,7 +88,7 @@
   Iterable
   (iterator [this] (SeqIterator. (. this seq))))
 
-(defn config-map
-  ([m] (config-map m "/" "default"))
+(defn crosshair
+  ([m] (crosshair m "/" "default"))
   ([m ns-sep default-ns]
      (mapstache mustache-renderer (ConfigResolver. m ns-sep default-ns))))
