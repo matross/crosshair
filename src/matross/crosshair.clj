@@ -1,6 +1,4 @@
 (ns matross.crosshair
-  (:require [matross.mapstache :refer [IRender mapstache no-template]]
-            [stencil.core :as mustache])
   (:import clojure.lang.ILookup
            clojure.lang.Seqable
            clojure.lang.SeqIterator
@@ -10,10 +8,6 @@
            clojure.lang.MapEntry))
 
 (declare crosshair)
-
-(def mustache-renderer
-  (reify IRender
-    (render [this s data] (mustache/render-string s data))))
 
 (defn name-ns-key [k]
   (->> k str (drop 1) (apply str)))
@@ -91,4 +85,4 @@
 (defn crosshair
   ([m] (crosshair m "/" "default"))
   ([m ns-sep default-ns]
-     (mapstache mustache-renderer (ConfigResolver. m ns-sep default-ns))))
+     (ConfigResolver. m ns-sep default-ns)))

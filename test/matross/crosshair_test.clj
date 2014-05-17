@@ -32,12 +32,6 @@
       (is (instance? MapEntry (.entryAt cr :ns/kwd)))
       (is (nil? (.entryAt cr :missing)))))
 
-  (testing "Templating occurs properly"
-    (let [cr (crosshair {:test {:foo "{{fact/bar}}" :baz "{{foo}}"}
-                          :fact {:bar "herp"}} "/" "test")]
-      (is (= (:foo cr) (:fact/bar cr)))
-      (is (= (:foo cr) (:baz cr)))))
-
   (testing "Config resolver is iterable"
     (let [cr (crosshair {:user {:foo "bar"}})
           s (seq cr)]
