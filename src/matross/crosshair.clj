@@ -24,7 +24,7 @@
        (clojure.string/join ns-sep)
        keyword))
 
-(deftype ConfigResolver [value ns-sep default-ns]
+(deftype Crosshair [value ns-sep default-ns]
   ILookup
   (valAt [this k] (. this valAt k nil))
   (valAt [this k not-found]
@@ -34,11 +34,11 @@
   IPersistentCollection
   (cons [this o]
     (let [[ns-key target-key] (internal-key (key o) ns-sep default-ns)]
-      (ConfigResolver. (update-in value [ns-key] conj (MapEntry. target-key (val o)))
+      (Crosshair. (update-in value [ns-key] conj (MapEntry. target-key (val o)))
                        ns-sep
                        default-ns)))
 
-  (empty [this] (ConfigResolver. {} ns-sep default-ns))
+  (empty [this] (Crosshair. {} ns-sep default-ns))
   (equiv [this o] (= (seq this) (seq o)))
   (count [this] (apply + (map #(count (val %1)) value)))
 
@@ -85,4 +85,4 @@
 (defn crosshair
   ([m] (crosshair m "/" "default"))
   ([m ns-sep default-ns]
-     (ConfigResolver. m ns-sep default-ns)))
+     (Crosshair. m ns-sep default-ns)))
