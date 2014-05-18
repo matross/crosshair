@@ -3,7 +3,7 @@
             [matross.crosshair :refer :all])
   (:import clojure.lang.MapEntry))
 
-(deftest config-resolver-behaves
+(deftest crosshair-behaves-as-expected
   (testing "I can retrieve values"
     (let [cr (crosshair {:ns {:kwd "foo"}})
           kwd :ns/kwd]
@@ -35,4 +35,9 @@
   (testing "Config resolver is iterable"
     (let [cr (crosshair {:user {:foo "bar"}})
           s (seq cr)]
-      (is (= (count s) 1)))))
+      (is (= (count s) 1))))
+
+  (testing "I can add namespaces"
+    (let [cr (-> (crosshair {})
+                 (add-ns :foo {:k :v}))]
+      (is (= (:foo/k cr) :v)))))

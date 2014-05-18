@@ -22,7 +22,15 @@
        (clojure.string/join ns-sep)
        keyword))
 
+(defprotocol ICrosshair
+  (add-ns [this ns] [this ns m]))
+
 (deftype Crosshair [value ns-sep default-ns]
+  ICrosshair
+  (add-ns [this ns] (. this add-ns ns {}))
+  (add-ns [this ns m]
+     (Crosshair. (assoc value ns m) ns-sep default-ns))
+
   ILookup
   (valAt [this k] (. this valAt k nil))
   (valAt [this k not-found]
