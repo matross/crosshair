@@ -7,8 +7,6 @@
            clojure.lang.Associative
            clojure.lang.MapEntry))
 
-(declare crosshair)
-
 (defn name-ns-key [k]
   (->> k str (drop 1) (apply str)))
 
@@ -46,7 +44,7 @@
   (assoc [this k v]
     (let [full-key (internal-key k ns-sep default-ns)
           new-value (assoc-in value full-key v)]
-      (crosshair new-value ns-sep default-ns)))
+      (Crosshair. new-value ns-sep default-ns)))
 
   (assocEx [this k v]
     (let [[ns _] (internal-key k ns-sep default-ns)]
@@ -57,7 +55,7 @@
   (without [this k]
     (let [[ns k] (internal-key k ns-sep default-ns)
           without-k (update-in value [ns] dissoc k)]
-      (crosshair without-k ns-sep default-ns)))
+      (Crosshair. without-k ns-sep default-ns)))
 
   Associative
   (containsKey [this k]
