@@ -8,29 +8,21 @@ templated & namespaced immutable maps, for configuration
 (require '[matross.crosshair :refer [crosshair]])
 
 (def config (crosshair {
-  :system {
-    :hostname "box"
-    :home "/home/user"
-  }
-  :default {
-    :bin "{{ system/home }}/bin"
-    :script "{{ bin }}/script.sh"
-  }
+  :ns {:key 23}
+  :default {:key 42}
 }))
 
-(def other-config
-  (assoc config :system/home     "/home/other"
-                :system/hostname "other-box"))
+;; behaves like a map, with special namespaced keys
+(def other-config (assoc config :ns/key 1234))
 
-;; top level keys become configuration namespaces
+(:ns/key other-config)
+; => 1234
 
-(:script other-config)          ; => "/home/other/bin/script.sh"
-(:system/hostname other-config) ; => "other-box"
+(:key other-config)
+; => 42
 
-;; immutable maps under the hood, original reference remains unchanged
-
-(:script config)          ; => "/home/user/bin/script.sh"
-(:system/hostname config) ; => "box"
+(:ns/key config)
+; => 23
 ```
 
 All top level keys become namespaces, and namespaced values can be referenced by `:ns/key`
