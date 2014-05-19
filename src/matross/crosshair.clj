@@ -8,7 +8,9 @@
            clojure.lang.MapEntry))
 
 (defn name-ns-key [k]
-  (->> k str (drop 1) (apply str)))
+  (if (keyword? k)
+    (->> k str (drop 1) (apply str))
+    (name k)))
 
 (defn- internal-key [k ns-sep default-ns]
   (let [ks (name-ns-key k)
