@@ -8,14 +8,9 @@
            clojure.lang.MapEntry))
 
 (defn name-ns-key
-  "When `name` is called on a keyword, the logic subs out to the `clojure.lang.Symbol`
-implementation, which treats it as a fully qualified symbol, eg `foo.bar/baz`. As such,
-if the `/` character is used as a namespace separator, calling name on `:foo/bar` will
-result in simply `bar` as the name. This function works around that issue."
+  "Retrieve the string version of the keyword, sans :"
   [k]
-  (if (keyword? k)
-    (->> k str (drop 1) (apply str))
-    (name k)))
+  (-> k str (subs 1)))
 
 (defn- internal-key [k ns-sep default-ns]
   (let [ks (name-ns-key k)
