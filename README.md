@@ -1,6 +1,6 @@
-# crosshair
+# Crosshair
 
-templated & namespaced immutable maps, for configuration
+Namespaced immutable maps, for configuration.
 
 ## Usage
 
@@ -12,17 +12,17 @@ templated & namespaced immutable maps, for configuration
   :default {:key 42}
 }))
 
+(:ns/key config)
+; => 23
+
+(:key other-config)
+; => 42
+
 ;; behaves like a map, with special namespaced keys
 (def other-config (assoc config :ns/key 1234))
 
 (:ns/key other-config)
 ; => 1234
-
-(:key other-config)
-; => 42
-
-(:ns/key config)
-; => 23
 ```
 
 All top level keys become namespaces, and namespaced values can be referenced by `:ns/key`
