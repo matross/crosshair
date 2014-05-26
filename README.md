@@ -3,6 +3,11 @@
 Namespaced immutable maps, for configuration.
 
 ## Usage
+Crosshair is available on Clojars. To include in your project, simply add the following to your dependencies:
+
+```clojure
+[matross/crosshair "0.1.0"]
+```
 
 ```clj
 (require '[matross.crosshair :refer [crosshair]])
