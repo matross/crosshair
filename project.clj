@@ -1,5 +1,5 @@
-(defproject matross/crosshair "0.1.0"
-  :description "FIXME: write description"
+(defproject matross/crosshair "0.2.0-SNAPSHOT"
+  :description "Namespaced map keys with a default namespace"
   :url "https://github.com/matross/crosshair"
   :dependencies [[org.clojure/clojure "1.6.0"]]
   :pom-addition [:developers [:developer
