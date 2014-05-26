@@ -6,7 +6,7 @@ Namespaced immutable maps, for configuration.
 Crosshair is available on Clojars. To include in your project, simply add the following to your dependencies:
 
 ```clojure
-[matross/crosshair "0.1.0"]
+[matross/crosshair "0.1.1"]
 ```
 
 ```clj
