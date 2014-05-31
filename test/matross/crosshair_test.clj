@@ -4,6 +4,10 @@
   (:import clojure.lang.MapEntry))
 
 (deftest crosshair-behaves-as-expected
+  (testing "I can seq it"
+    (let [cr (crosshair {:ns {}})]
+      (is (= (seq cr) (seq {})))))
+
   (testing "I can retrieve values"
     (let [cr (crosshair {:ns {:kwd "foo"}})
           kwd :ns/kwd]

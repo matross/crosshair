@@ -85,7 +85,9 @@
               (let [ns-curr-key (external-key [ns-key curr-key] ns-sep)]
                 (MapEntry. ns-curr-key curr-val)))
             (ns-maps [[ns-key m]] (map (partial ns-entry ns-key) m))]
-      (mapcat ns-maps value)))
+      (let [result (mapcat ns-maps value)]
+       (if-not (empty? result)
+         result))))
 
   Iterable
   (iterator [this] (SeqIterator. (. this seq))))

@@ -1,4 +1,4 @@
-(defproject matross/crosshair "0.1.1"
+(defproject matross/crosshair "0.1.2"
   :description "FIXME: write description"
   :url "https://github.com/matross/crosshair"
   :license {:name "Eclipse Public License"
