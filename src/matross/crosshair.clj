@@ -1,11 +1,5 @@
 (ns matross.crosshair
-  (:import clojure.lang.ILookup
-           clojure.lang.Seqable
-           clojure.lang.SeqIterator
-           clojure.lang.IPersistentCollection
-           clojure.lang.IPersistentMap
-           clojure.lang.Associative
-           clojure.lang.MapEntry))
+  (:require [potemkin :refer [def-map-type]]))
 
 (defn name-ns-key
   "Retrieve the string version of the keyword, sans :"
@@ -27,68 +21,33 @@
 (defprotocol ICrosshair
   (add-ns [this ns] [this ns m]))
 
-(deftype Crosshair [value ns-sep default-ns]
+(def-map-type Crosshair [value ns-sep default-ns]
+  (assoc [_ k v]
+         (let [full-key (internal-key k ns-sep default-ns)
+               new-value (assoc-in value full-key v)]
+           (Crosshair. new-value ns-sep default-ns)))
+
+  (dissoc [_ k]
+          (let [[ns k] (internal-key k ns-sep default-ns)
+                without-k (update-in value [ns] dissoc k)]
+            (Crosshair. without-k ns-sep default-ns)))
+
+  (get [_ k not-found]
+       (let [[ns-key target-key :as full-key] (internal-key k ns-sep default-ns)]
+         (get-in value full-key not-found)))
+
+  (keys [_]
+        (let [ns-ks (keys value)
+              ks (mapcat (fn [ns-k]
+                           (map #(external-key [ns-k %] ns-sep) (keys (get value ns-k))))
+                         ns-ks)]
+          ks))
+
+  (containsKey [_ k] (not (nil? (get-in value (internal-key k ns-sep default-ns)))))
+
   ICrosshair
-  (add-ns [this ns] (. this add-ns ns {}))
-  (add-ns [this ns m]
-     (Crosshair. (assoc value ns m) ns-sep default-ns))
-
-  ILookup
-  (valAt [this k] (. this valAt k nil))
-  (valAt [this k not-found]
-    (let [[ns-key target-key :as full-key] (internal-key k ns-sep default-ns)]
-      (get-in value full-key not-found)))
-
-  IPersistentCollection
-  (cons [this o]
-    (let [[ns-key target-key] (internal-key (key o) ns-sep default-ns)]
-      (Crosshair. (update-in value [ns-key] conj (MapEntry. target-key (val o)))
-                       ns-sep
-                       default-ns)))
-
-  (empty [this] (Crosshair. {} ns-sep default-ns))
-  (equiv [this o] (= (seq this) (seq o)))
-  (count [this] (apply + (map #(count (val %1)) value)))
-
-  IPersistentMap
-  (assoc [this k v]
-    (let [full-key (internal-key k ns-sep default-ns)
-          new-value (assoc-in value full-key v)]
-      (Crosshair. new-value ns-sep default-ns)))
-
-  (assocEx [this k v]
-    (let [[ns _] (internal-key k ns-sep default-ns)]
-      (if (contains? k (ns value))
-        (throw (IllegalArgumentException. (str "Already contains key: " k)))
-        (.assoc this k v))))
-
-  (without [this k]
-    (let [[ns k] (internal-key k ns-sep default-ns)
-          without-k (update-in value [ns] dissoc k)]
-      (Crosshair. without-k ns-sep default-ns)))
-
-  Associative
-  (containsKey [this k]
-    (let [[ns-key target-key :as full-key] (internal-key k ns-sep default-ns)]
-      (contains? (ns-key value) target-key)))
-
-  (entryAt [this k]
-    (if (.containsKey this k)
-      (let [full-key (internal-key k ns-sep default-ns)]
-        (MapEntry.
-         (external-key full-key ns-sep)
-         (get-in value full-key)))))
-
-  Seqable
-  (seq [this]
-    (letfn [(ns-entry [ns-key [curr-key curr-val]]
-              (let [ns-curr-key (external-key [ns-key curr-key] ns-sep)]
-                (MapEntry. ns-curr-key curr-val)))
-            (ns-maps [[ns-key m]] (map (partial ns-entry ns-key) m))]
-      (mapcat ns-maps value)))
-
-  Iterable
-  (iterator [this] (SeqIterator. (. this seq))))
+  (add-ns [this n] (add-ns this n {})) 
+  (add-ns [this n m] (Crosshair. (assoc value n m) ns-sep default-ns)))
 
 (defn crosshair
   ([m] (crosshair m "/" "default"))
